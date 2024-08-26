@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
@@ -58,19 +59,14 @@ public class SelectContactModule extends ReactContextBaseJavaModule implements A
      */
     private void launchPicker(Promise contactsPromise, int requestCode) {
         mContactsPromise = contactsPromise;
-        Cursor cursor = this.contentResolver.query(Contacts.CONTENT_URI, null, null, null, null);
-        
-        if (cursor != null) {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType(Contacts.CONTENT_TYPE);
+       
+            Intent intent = new Intent(Intent.ACTION_PICK,ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+//            intent.setType(Contacts.CONTENT_TYPE);
             Activity activity = getCurrentActivity();
             if (intent.resolveActivity(activity.getPackageManager()) != null) {
                 activity.startActivityForResult(intent, requestCode);
             }
-            cursor.close();
-        } else {
-            mContactsPromise.reject(E_CONTACT_PERMISSION, "no permission");
-        }
+       
     }
 
     @Override
@@ -89,55 +85,42 @@ public class SelectContactModule extends ReactContextBaseJavaModule implements A
         WritableMap contactData = Arguments.createMap();
 
         try {
-            String id = getContactId(intent.getData());
-            contactData.putString("recordId", id);
-            Uri contactUri = buildContactUri(id);
+//            String id = getContactId(intent.getData());
+//            contactData.putString("recordId", id);
+//            Uri contactUri = buildContactUri(id);
             boolean foundData = false;
 
             WritableArray phones = Arguments.createArray();
             WritableArray emails = Arguments.createArray();
             WritableArray postalAddresses = Arguments.createArray();
 
-            Cursor cursor = openContactQuery(contactUri);
-            if (cursor.moveToFirst()) {
-                do {
-                    String mime = cursor.getString(cursor.getColumnIndex(Entity.MIMETYPE));
-                    switch (mime) {
-                        case StructuredName.CONTENT_ITEM_TYPE:
-                            addNameData(contactData, cursor);
-                            foundData = true;
-                            break;
 
-                        case StructuredPostal.CONTENT_ITEM_TYPE:
-                            addPostalData(postalAddresses, cursor, activity);
-                            foundData = true;
-                            break;
 
-                        case Phone.CONTENT_ITEM_TYPE:
-                            addPhoneEntry(phones, cursor, activity);
-                            foundData = true;
-                            break;
+            Cursor cursor = activity.getContentResolver().query(intent.getData(), null, null, null, null);
+            if (cursor != null &&  cursor.moveToFirst()) {
 
-                        case Email.CONTENT_ITEM_TYPE:
-                            addEmailEntry(emails, cursor, activity);
-                            foundData = true;
-                            break;
-                    }
-                } while (cursor.moveToNext());
+         int any=cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                String number = cursor.getString(any);
+                String fullName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                foundData= true;
+                addPhoneEntry(phones, cursor, activity);
+                contactData.putArray("phones", phones);
+                contactData.putString("phone", number);
+                contactData.putString("name", fullName);
+    
             }
             cursor.close();
 
-            contactData.putArray("phones", phones);
-            contactData.putArray("emails", emails);
-            contactData.putArray("postalAddresses", postalAddresses);
+
+//            contactData.putArray("postalAddresses", postalAddresses);
 
             if (foundData) {
                 mContactsPromise.resolve(contactData);
             } else {
                 mContactsPromise.reject(E_CONTACT_NO_DATA, "No data found for contact");
             }
-        } catch (SelectContactException e) {
-            mContactsPromise.reject(E_CONTACT_EXCEPTION, e.getMessage());
+//        } catch (SelectContactException e) {
+//            mContactsPromise.reject(E_CONTACT_EXCEPTION, e.getMessage());
         } catch (Exception e) {
             Log.e(TAG, "Unexpected exception reading from contacts", e);
             mContactsPromise.reject(E_CONTACT_EXCEPTION, e.getMessage());
