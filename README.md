@@ -7,11 +7,14 @@ This is a simple wrapper for the native iOS and Android Contact Picker UIs, with
 ### Installation
 
 ```
-yarn add react-native-select-contact
+yarn add react-native-select-contact@https://github.com/chen834921478/react-native-contact-select.git
+
+
 ```
 or with NPM
 ```
-npm install react-native-select-contact
+npm install react-native-select-contact@https://github.com/chen834921478/react-native-contact-select.git
+
 ```
 
 For React Native => 0.59 only:
