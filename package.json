@@ -1,7 +1,7 @@
 {
   "name": "@chen834921478/react-native-select-contact",
   "description": "A react native company to select a contact from your phone's contact list",
-  "version": "1.7.0",
+  "version": "1.6.3",
   "nativePackage": true,
   "typings": "./selectContact.d.ts",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chen834921478//react-native-select-contact.git"
+    "url": "git+https://github.com/chen834921478/react-native-select-contact.git"
   },
   "keywords": [
     "react",
@@ -20,11 +20,11 @@
     "select contact"
   ],
   "author": {
-    "name": "chen834921478/ (originally LynxIT iDigital)"
+    "name": "chen834921478 (originally LynxIT iDigital)"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chen834921478//react-native-select-contact/issues"
+    "url": "https://github.com/chen834921478/react-native-select-contact/issues"
   },
   "homepage": "https://github.com/chen834921478/react-native-select-contact",
   "maintainers": [

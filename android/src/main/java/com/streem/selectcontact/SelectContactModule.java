@@ -61,7 +61,6 @@ public class SelectContactModule extends ReactContextBaseJavaModule implements A
         mContactsPromise = contactsPromise;
        
             Intent intent = new Intent(Intent.ACTION_PICK,ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-//            intent.setType(Contacts.CONTENT_TYPE);
             Activity activity = getCurrentActivity();
             if (intent.resolveActivity(activity.getPackageManager()) != null) {
                 activity.startActivityForResult(intent, requestCode);
@@ -74,28 +73,19 @@ public class SelectContactModule extends ReactContextBaseJavaModule implements A
         if (mContactsPromise == null || requestCode != CONTACT_REQUEST) {
             return;
         }
-
         //Request was cancelled
         if (resultCode != Activity.RESULT_OK) {
             mContactsPromise.reject(E_CONTACT_CANCELLED, "Cancelled");
             return;
-        }
-
-        // Retrieve all possible data about contact and return as a JS object
+        } 
         WritableMap contactData = Arguments.createMap();
 
         try {
-//            String id = getContactId(intent.getData());
-//            contactData.putString("recordId", id);
-//            Uri contactUri = buildContactUri(id);
+ 
             boolean foundData = false;
-
             WritableArray phones = Arguments.createArray();
             WritableArray emails = Arguments.createArray();
             WritableArray postalAddresses = Arguments.createArray();
-
-
-
             Cursor cursor = activity.getContentResolver().query(intent.getData(), null, null, null, null);
             if (cursor != null &&  cursor.moveToFirst()) {
 
@@ -109,18 +99,13 @@ public class SelectContactModule extends ReactContextBaseJavaModule implements A
                 contactData.putString("name", fullName);
     
             }
-            cursor.close();
-
-
-//            contactData.putArray("postalAddresses", postalAddresses);
+            cursor.close(); 
 
             if (foundData) {
                 mContactsPromise.resolve(contactData);
             } else {
                 mContactsPromise.reject(E_CONTACT_NO_DATA, "No data found for contact");
-            }
-//        } catch (SelectContactException e) {
-//            mContactsPromise.reject(E_CONTACT_EXCEPTION, e.getMessage());
+            } 
         } catch (Exception e) {
             Log.e(TAG, "Unexpected exception reading from contacts", e);
             mContactsPromise.reject(E_CONTACT_EXCEPTION, e.getMessage());
